@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartPlug — Kontrol Rumah Pintar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+:root{
+  --blue:#155EEF;--blue-dark:#0E45C0;--blue-light:#E9F0FF;
+  --navy:#0A1A3C;--navy2:#102A5E;
+  --bg:#F4F6FC;--white:#fff;
+  --text:#16213E;--muted:#8A93A8;
+  --border:#E8ECF4;--grey:#F0F2F7;
+  --green:#1FAA59;--green-light:#E7F8ED;
+  --red:#E5484D;--red-light:#FDEAEB;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ===== AUTH PAGES ===== */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy2) 0%,var(--navy) 50%,#0c1428 100%);padding:24px;}
+.auth-card{background:var(--white);border-radius:24px;padding:40px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,.25);}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center;}
+.auth-brand-icon{width:42px;height:42px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.auth-brand span{font-size:1.3rem;font-weight:800;color:var(--blue);letter-spacing:.04em;}
+.auth-card h2{font-size:1.4rem;font-weight:700;margin-bottom:6px;}
+.auth-card .sub{font-size:.83rem;color:var(--muted);margin-bottom:24px;}
+.form-lbl{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:6px;display:block;}
+.input-wrap{display:flex;align-items:center;gap:10px;background:var(--grey);border-radius:12px;padding:.7rem .95rem;margin-bottom:14px;transition:.15s;border:1.5px solid transparent;}
+.input-wrap:focus-within{border-color:var(--blue);background:#fff;}
+.input-wrap i{color:var(--muted);font-size:.95rem;flex-shrink:0;}
+.input-wrap input{border:none;background:transparent;outline:none;flex:1;font-size:.88rem;font-family:inherit;color:var(--text);}
+.btn-app{border:none;border-radius:12px;padding:.78rem 1.2rem;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.15s;text-decoration:none;}
+.btn-primary2{background:var(--blue);color:#fff;} .btn-primary2:hover{background:var(--blue-dark);}
+.btn-outline2{background:var(--white);color:var(--blue);border:1.5px solid var(--blue-light);} .btn-outline2:hover{background:var(--blue-light);}
+.btn-danger2{background:var(--white);color:var(--red);border:1.5px solid var(--red-light);} .btn-danger2:hover{background:var(--red-light);}
+.btn-grey{background:var(--grey);color:var(--text);} .btn-grey:hover{background:#e2e6ef;}
+.divider{display:flex;align-items:center;color:var(--muted);font-size:.78rem;margin:18px 0;}
+.divider::before,.divider::after{content:'';flex:1;border-bottom:1px solid var(--border);}
+.divider span{padding:0 12px;}
+.lnk{color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none;}
+.lnk:hover{text-decoration:underline;}
+
+/* ===== MAIN LAYOUT ===== */
+.app-layout{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid var(--border);}
+.sidebar-brand-icon{width:34px;height:34px;border-radius:10px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.sidebar-brand span{font-size:1.05rem;font-weight:800;color:var(--blue);letter-spacing:.04em;}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-section{font-size:.66rem;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;padding:12px 10px 6px;}
+.nav-link-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;font-size:.86rem;font-weight:600;color:var(--text);cursor:pointer;transition:.12s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
+.nav-link-item i{font-size:1.05rem;width:20px;text-align:center;color:var(--muted);}
+.nav-link-item:hover{background:var(--bg);}
+.nav-link-item.active{background:var(--blue-light);color:var(--blue);}
+.nav-link-item.active i{color:var(--blue);}
+.nav-dot-badge{width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:auto;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:10px;}
+.sidebar-avatar{width:38px;height:38px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.sidebar-user-info .name{font-size:.84rem;font-weight:700;}
+.sidebar-user-info .email{font-size:.7rem;color:var(--muted);}
+
+.main-content{margin-left:240px;flex:1;padding:28px 32px 40px;min-height:100vh;}
+.page-header{margin-bottom:24px;}
+.page-header h1{font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.page-header p{font-size:.84rem;color:var(--muted);}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+.topbar-greeting h1{font-size:1.3rem;font-weight:800;margin:0;}
+.topbar-greeting p{font-size:.82rem;color:var(--muted);margin:3px 0 0;}
+.topbar-actions{display:flex;align-items:center;gap:12px;}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;position:relative;color:var(--text);transition:.12s;}
+.icon-btn:hover{background:var(--grey);}
+.icon-btn .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--white);}
+
+/* ===== SCREENS ===== */
+.scr{display:none;}
+.scr.active{display:block;}
+
+/* ===== HOME ===== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.stat-card.energy{background:linear-gradient(120deg,var(--blue),#3B6CF0 85%);color:#fff;grid-column:span 2;}
+.stat-card .lbl{font-size:.75rem;font-weight:600;opacity:.8;margin-bottom:6px;}
+.stat-card.energy .lbl{opacity:.85;}
+.stat-card .val{font-size:1.7rem;font-weight:800;margin:0;}
+.stat-card .val span{font-size:.95rem;font-weight:600;}
+.stat-card .ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:12px;}
+.stat-card .ico.blue{background:var(--blue-light);color:var(--blue);}
+.stat-card .ico.red{background:var(--red-light);color:var(--red);}
+.stat-card .ico.green{background:var(--green-light);color:var(--green);}
+.stat-card .ico.white{background:rgba(255,255,255,.2);color:#fff;}
+.stat-card .sub-stat{font-size:.75rem;color:var(--muted);margin-top:4px;}
+.stat-card.energy .sub-stat{color:rgba(255,255,255,.75);}
+
+.section-header{display:flex;justify-content:space-between;align-items:center;margin:28px 0 16px;}
+.section-header h2{font-size:1rem;font-weight:700;}
+
+.device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+.dev-card{background:var(--white);border-radius:16px;padding:18px;cursor:pointer;box-shadow:0 2px 12px rgba(16,26,62,.05);border:1.5px solid transparent;transition:.15s;}
+.dev-card:hover{border-color:var(--blue-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,26,62,.09);}
+.dev-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.dev-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.dev-ico.on{background:var(--blue-light);color:var(--blue);}
+.dev-ico.off{background:var(--grey);color:var(--muted);}
+.dev-card .dn{font-weight:700;font-size:.9rem;margin-bottom:3px;}
+.dev-card .ds{font-size:.74rem;color:var(--muted);}
+.dev-card .ds.on{color:var(--green);}
+.add-dev-card{border:1.5px dashed var(--border)!important;background:transparent!important;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:.85rem;font-weight:600;min-height:116px;}
+.add-dev-card:hover{border-color:var(--blue)!important;color:var(--blue);}
+.add-dev-card i{font-size:1.4rem;}
+
+/* ===== Quick actions ===== */
+.quick-actions-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.qa-card{background:var(--white);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 2px 12px rgba(16,26,62,.05);border:1.5px solid transparent;transition:.15s;}
+.qa-card:hover{border-color:var(--blue-light);}
+.qa-icon{width:44px;height:44px;border-radius:13px;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.qa-card .qa-text p{font-size:.85rem;font-weight:700;margin:0;}
+.qa-card .qa-text span{font-size:.72rem;color:var(--muted);}
+
+/* ===== SCHEDULE ===== */
+.sched-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+.sch-card{background:var(--white);border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.sch-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.sch-info{display:flex;align-items:center;gap:12px;}
+.sch-ico{width:42px;height:42px;border-radius:12px;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.sch-info .name{font-weight:700;font-size:.9rem;margin:0;}
+.sch-info .status{font-size:.73rem;color:var(--muted);margin-top:2px;}
+.sch-info .status.run{color:var(--green);}
+.sch-times{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:12px;padding:12px 18px;margin-bottom:14px;}
+.sch-t .t-lbl{font-size:.62rem;font-weight:700;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+.sch-t .t-val{font-size:1rem;font-weight:700;}
+.days{display:flex;gap:6px;}
+.dp{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;background:var(--grey);color:var(--muted);}
+.dp.a{background:var(--blue);color:#fff;}
+
+/* ===== NOTIFICATIONS ===== */
+.notif-layout{display:grid;grid-template-columns:1fr 360px;gap:20px;}
+.notif-list-panel{background:var(--white);border-radius:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);overflow:hidden;}
+.notif-panel-hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border);}
+.notif-panel-hdr h3{font-size:1rem;font-weight:700;margin:0;}
+.notif-group-label{font-size:.66rem;font-weight:700;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;padding:14px 20px 8px;}
+.notif-row{display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;}
+.notif-row:hover{background:var(--bg);}
+.notif-row:last-child{border-bottom:none;}
+.n-ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.n-ico.red{background:var(--red-light);color:var(--red);}
+.n-ico.grey{background:var(--grey);color:var(--muted);}
+.n-ico.green{background:var(--green-light);color:var(--green);}
+.n-ico.blue{background:var(--blue-light);color:var(--blue);}
+.n-body{flex:1;}
+.n-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.n-title{font-weight:700;font-size:.85rem;margin:0;}
+.n-time{font-size:.68rem;color:var(--muted);white-space:nowrap;}
+.n-desc{font-size:.77rem;color:var(--muted);line-height:1.45;}
+.empty-notif{text-align:center;padding:40px 20px;color:var(--muted);font-size:.85rem;}
+.empty-notif i{font-size:2rem;display:block;margin-bottom:10px;}
+
+.notif-summary-panel{display:flex;flex-direction:column;gap:14px;}
+.summ-card{background:var(--white);border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.summ-card h4{font-size:.85rem;font-weight:700;margin-bottom:14px;}
+
+/* ===== PROFILE ===== */
+.profile-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;}
+.profile-card{background:var(--white);border-radius:18px;padding:28px;text-align:center;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 14px;}
+.profile-card h3{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+.profile-card .email{font-size:.8rem;color:var(--muted);}
+.profile-card .phone{font-size:.8rem;color:var(--muted);}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+.profile-stat{background:var(--bg);border-radius:12px;padding:14px;text-align:center;}
+.profile-stat .pn{font-size:1.3rem;font-weight:800;margin:0;}
+.profile-stat .pl{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.settings-panel{background:var(--white);border-radius:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);overflow:hidden;}
+.settings-panel-hdr{padding:18px 20px;border-bottom:1px solid var(--border);font-size:.95rem;font-weight:700;}
+.s-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;font-size:.87rem;font-weight:600;}
+.s-item:last-child{border-bottom:none;}
+.s-item:hover{background:var(--bg);}
+.s-item i.lead{color:var(--blue);font-size:1.05rem;width:22px;text-align:center;}
+.s-item .chev{margin-left:auto;color:var(--muted);}
+
+/* ===== TIMER ===== */
+.timer-layout{display:grid;grid-template-columns:400px 1fr;gap:20px;}
+.timer-panel{background:var(--white);border-radius:18px;padding:32px;box-shadow:0 2px 12px rgba(16,26,62,.05);text-align:center;}
+.timer-ring{width:220px;height:220px;border-radius:50%;border:6px solid var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;}
+.timer-disp{font-size:2.1rem;font-weight:800;letter-spacing:.02em;}
+.pill-row{display:flex;gap:10px;justify-content:center;margin-bottom:22px;}
+.pill{border:1.5px solid var(--border);background:var(--white);border-radius:20px;padding:.48rem 1.1rem;font-size:.8rem;font-weight:600;color:var(--text);cursor:pointer;transition:.12s;}
+.pill:hover,.pill.active{background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+.time-set{display:flex;justify-content:center;gap:16px;margin-bottom:24px;}
+.ts-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ts-col input{width:64px;text-align:center;border:1.5px solid var(--border);border-radius:10px;padding:.55rem 0;font-size:1.1rem;font-weight:700;color:var(--text);outline:none;transition:.12s;}
+.ts-col input:focus{border-color:var(--blue);}
+.ts-col label{font-size:.64rem;color:var(--muted);font-weight:700;letter-spacing:.05em;}
+.timer-device-list{background:var(--white);border-radius:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);overflow:hidden;}
+.timer-device-list h4{padding:18px 20px;border-bottom:1px solid var(--border);font-size:.92rem;font-weight:700;margin:0;}
+.t-dev-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);}
+.t-dev-row:last-child{border-bottom:none;}
+.t-dev-ico{width:38px;height:38px;border-radius:10px;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.t-dev-info .dn{font-weight:700;font-size:.85rem;margin:0;}
+.t-dev-info .ds{font-size:.72rem;color:var(--muted);margin:0;}
+.t-dev-row .apply-btn{margin-left:auto;background:var(--blue-light);color:var(--blue);border:none;border-radius:8px;padding:.38rem .8rem;font-size:.74rem;font-weight:700;cursor:pointer;}
+
+/* ===== DEVICE DETAIL ===== */
+.detail-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;}
+.detail-main-card{background:var(--white);border-radius:18px;padding:28px;text-align:center;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.d-ico-wrap{position:relative;display:inline-block;margin-bottom:16px;}
+.d-ico{width:90px;height:90px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:2.3rem;}
+.d-badge{position:absolute;bottom:-2px;right:-8px;font-size:.64rem;font-weight:700;padding:.2rem .6rem;border-radius:20px;}
+.d-badge.on{background:var(--green-light);color:var(--green);}
+.d-badge.off{background:var(--grey);color:var(--muted);}
+.detail-main-card h3{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+.detail-main-card .sub{font-size:.78rem;color:var(--muted);}
+.pwr-wrap{margin:22px 0;}
+.pwr-btn{width:68px;height:68px;border-radius:50%;background:var(--blue);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer;margin:0 auto 10px;box-shadow:0 10px 24px -6px rgba(21,94,239,.5);transition:.15s;}
+.pwr-btn:hover{transform:scale(1.07);}
+.pwr-btn.off{background:var(--grey);color:var(--muted);box-shadow:none;}
+.pwr-lbl{font-weight:700;font-size:.85rem;color:var(--blue);}
+.pwr-lbl.off{color:var(--muted);}
+.detail-right{display:flex;flex-direction:column;gap:16px;}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.met-c{background:var(--white);border-radius:16px;padding:18px;text-align:center;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.met-c .mv{font-weight:800;font-size:1.3rem;margin:0;}
+.met-c .mu{font-size:.72rem;color:var(--muted);font-weight:600;margin-top:3px;}
+.usage-card{background:var(--white);border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.usage-card h4{font-size:.85rem;font-weight:700;margin-bottom:14px;}
+.usage-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.usage-row .ul{font-size:.78rem;color:var(--muted);}
+.usage-row .uv{font-weight:800;font-size:1rem;}
+.prog{height:8px;border-radius:6px;background:var(--grey);overflow:hidden;margin-bottom:8px;}
+.prog .fill{height:100%;background:var(--blue);border-radius:6px;}
+.prog-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);}
+
+/* ===== ADD DEVICE ===== */
+.add-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+.add-card{background:var(--white);border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(16,26,62,.05);}
+.pair-illus{height:160px;border-radius:16px;background:linear-gradient(135deg,var(--navy2),var(--navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem;margin-bottom:18px;}
+.cat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.cat-pill{border:1.5px solid var(--border);border-radius:20px;padding:.44rem .9rem;font-size:.78rem;font-weight:600;color:var(--text);background:var(--white);cursor:pointer;transition:.12s;}
+.cat-pill:hover,.cat-pill.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.qr-box{border:2px dashed var(--border);border-radius:16px;height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:3rem;margin-bottom:16px;gap:8px;cursor:pointer;transition:.12s;}
+.qr-box:hover{border-color:var(--blue);color:var(--blue);}
+.qr-box span{font-size:.78rem;font-weight:600;}
+
+/* ===== SUCCESS / OFFLINE ===== */
+.center-card{max-width:500px;margin:40px auto;background:var(--white);border-radius:20px;padding:40px;text-align:center;box-shadow:0 4px 24px rgba(16,26,62,.08);}
+.suc-check{width:80px;height:80px;border-radius:50%;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto 20px;}
+.off-ico-wrap{position:relative;display:inline-block;margin-bottom:20px;}
+.off-ico{width:100px;height:100px;border-radius:50%;background:var(--red-light);color:#E59AA0;display:flex;align-items:center;justify-content:center;font-size:2.8rem;}
+.off-badge{position:absolute;bottom:0;right:-4px;width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;border:3px solid var(--white);}
+.off-tag{color:var(--red);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;}
+.off-tag .dot-r{width:6px;height:6px;border-radius:50%;background:var(--red);}
+.center-card h3{font-size:1.2rem;font-weight:800;margin-bottom:10px;}
+.center-card .desc{font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.dev-result{display:flex;align-items:center;gap:14px;background:var(--bg);border-radius:14px;padding:14px;text-align:left;margin-bottom:22px;}
+.dr-ico{width:44px;height:44px;border-radius:12px;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.dr-thumb{width:48px;height:48px;border-radius:10px;margin-left:auto;background:linear-gradient(135deg,#CFE3FF,#9FC2FF);flex-shrink:0;}
+.hlp{font-size:.78rem;color:var(--muted);}
+.hlp a{color:var(--blue);font-weight:700;text-decoration:none;}
+
+/* Form switch color */
+.sw input:checked{background-color:var(--blue)!important;border-color:var(--blue)!important;}
+.sw input:focus{box-shadow:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ==================== SPLASH / AUTH ==================== -->
+<div id="page-splash" class="scr active">
+  <div class="auth-page">
+    <div style="text-align:center;max-width:460px;width:100%;">
+      <div style="margin-bottom:32px;">
+        <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--blue),#3B82F6);display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 16px;color:#fff;"><i class="bi bi-plug-fill"></i></div>
+        <h1 style="font-size:2rem;font-weight:800;color:#fff;letter-spacing:.04em;">SMARTPLUG</h1>
+        <p style="color:#9FB4E8;font-size:.8rem;letter-spacing:.3em;font-weight:600;margin-top:6px;">CONTROL</p>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:24px;padding:32px;margin-bottom:24px;border:1px solid rgba(255,255,255,.1);">
+        <div style="font-size:4rem;margin-bottom:16px;color:rgba(255,255,255,.85);"><i class="bi bi-house-door-fill"></i></div>
+        <h2 style="font-size:1.15rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:8px;">Kontrol Perangkat Rumah Dari Mana Saja</h2>
+        <p style="font-size:.82rem;color:#9FB4E8;">Hemat energi, kelola pintar, kapan saja &amp; di mana saja.</p>
+      </div>
+      <button class="btn-app" style="background:#fff;color:var(--navy);width:100%;font-size:.95rem;padding:.88rem;" onclick="go('login')">Mulai Sekarang &nbsp;<i class="bi bi-arrow-right"></i></button>
+      <p style="color:#7A93C9;font-size:.7rem;margin-top:16px;">Versi 2.4.0 • Didukung oleh IoT Cloud</p>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="page-login" class="scr">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand"><div class="auth-brand-icon"><i class="bi bi-plug-fill"></i></div><span>SMARTPLUG</span></div>
+      <h2>Masuk ke Akun</h2>
+      <p class="sub">Kelola rumah pintar Anda dengan mudah</p>
+      <label class="form-lbl">Email</label>
+      <div class="input-wrap"><i class="bi bi-envelope"></i><input type="email" placeholder="contoh@email.com"></div>
+      <div class="d-flex justify-content-between align-items-center"><label class="form-lbl">Kata Sandi</label><a class="lnk" style="font-size:.74rem;">Lupa Password?</a></div>
+      <div class="input-wrap"><i class="bi bi-lock"></i><input type="password" placeholder="••••••••"><i class="bi bi-eye-slash" style="cursor:pointer;color:var(--muted);"></i></div>
+      <button class="btn-app btn-primary2 w-100 mt-2" onclick="go('home')">Masuk &nbsp;<i class="bi bi-arrow-right"></i></button>
+      <div class="divider"><span>Atau</span></div>
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn-app btn-grey w-100"><i class="bi bi-google"></i> Google</button>
+        <button class="btn-app btn-grey w-100"><i class="bi bi-facebook"></i> Facebook</button>
+      </div>
+      <p class="text-center" style="font-size:.82rem;color:var(--muted);">Belum punya akun? <a class="lnk" onclick="go('register')">Daftar Akun</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="page-register" class="scr">
+  <div class="auth-page">
+    <div class="auth-card" style="max-width:500px;">
+      <div class="auth-brand"><div class="auth-brand-icon"><i class="bi bi-plug-fill"></i></div><span>SMARTPLUG</span></div>
+      <h2>Buat Akun Baru</h2>
+      <p class="sub">Lengkapi detail di bawah untuk mengelola perangkat pintar Anda.</p>
+      <div class="row g-3">
+        <div class="col-12"><label class="form-lbl">Nama Lengkap</label><div class="input-wrap"><i class="bi bi-person"></i><input type="text" placeholder="Contoh: Budi Santoso"></div></div>
+        <div class="col-12"><label class="form-lbl">Email</label><div class="input-wrap"><i class="bi bi-envelope"></i><input type="email" placeholder="nama@email.com"></div></div>
+        <div class="col-12"><label class="form-lbl">Nomor HP</label><div class="input-wrap"><i class="bi bi-telephone"></i><input type="text" placeholder="0812xxxx"></div></div>
+        <div class="col-6"><label class="form-lbl">Password</label><div class="input-wrap" style="margin-bottom:0;"><i class="bi bi-lock"></i><input type="password" placeholder="Min. 8 karakter"></div></div>
+        <div class="col-6"><label class="form-lbl">Konfirmasi Password</label><div class="input-wrap" style="margin-bottom:0;"><i class="bi bi-lock"></i><input type="password" placeholder="Ulangi password"></div></div>
+      </div>
+      <div class="form-check mt-3 mb-3"><input class="form-check-input" type="checkbox" id="agreeT"><label class="form-check-label" for="agreeT" style="font-size:.74rem;color:var(--muted);">Saya setuju dengan <a class="lnk">Syarat &amp; Ketentuan</a> serta <a class="lnk">Kebijakan Privasi</a>.</label></div>
+      <button class="btn-app btn-primary2 w-100" onclick="go('home')">Daftar Sekarang</button>
+      <div class="divider"><span>Atau daftar dengan</span></div>
+      <div class="d-flex gap-2 mb-3"><button class="btn-app btn-grey w-100"><i class="bi bi-google"></i> Google</button><button class="btn-app btn-grey w-100"><i class="bi bi-facebook"></i> Facebook</button></div>
+      <p class="text-center" style="font-size:.82rem;color:var(--muted);">Sudah punya akun? <a class="lnk" onclick="go('login')">Masuk</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="page-app" class="scr">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon"><i class="bi bi-plug-fill"></i></div>
+        <span>SMARTPLUG</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Menu Utama</div>
+        <button class="nav-link-item active" id="nav-home" onclick="showTab('home')"><i class="bi bi-house-door-fill"></i> Beranda</button>
+        <button class="nav-link-item" id="nav-schedule" onclick="showTab('schedule')"><i class="bi bi-calendar3"></i> Jadwal Otomatis</button>
+        <button class="nav-link-item" id="nav-timer" onclick="showTab('timer')"><i class="bi bi-stopwatch"></i> Timer</button>
+        <div class="nav-section">Perangkat</div>
+        <button class="nav-link-item" id="nav-device-detail" onclick="showTab('device-detail')"><i class="bi bi-cpu"></i> Detail Perangkat</button>
+        <button class="nav-link-item" id="nav-add-device" onclick="showTab('add-device')"><i class="bi bi-plus-circle"></i> Tambah Perangkat</button>
+        <div class="nav-section">Akun</div>
+        <button class="nav-link-item" id="nav-notifications" onclick="showTab('notifications')"><i class="bi bi-bell"></i> Notifikasi <span class="nav-dot-badge"></span></button>
+        <button class="nav-link-item" id="nav-profile" onclick="showTab('profile')"><i class="bi bi-person-circle"></i> Profil</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar"><i class="bi bi-person-fill"></i></div>
+          <div class="sidebar-user-info"><p class="name">Aditya Pratama</p><p class="email">aditya@email.com</p></div>
+          <button class="icon-btn" style="margin-left:auto;width:32px;height:32px;font-size:.85rem;" onclick="go('login')"><i class="bi bi-box-arrow-right" style="color:var(--red);"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TAB: HOME -->
+      <div class="tab-content active" id="tab-home">
+        <div class="topbar">
+          <div class="topbar-greeting"><h1>Halo, Aulia 👋</h1><p>Semua sistem berjalan dengan normal.</p></div>
+          <div class="topbar-actions">
+            <button class="icon-btn" onclick="showTab('notifications')"><i class="bi bi-bell"></i><span class="dot"></span></button>
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.2rem;"><i class="bi bi-person-fill"></i></div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card energy">
+            <div class="ico white"><i class="bi bi-lightning-charge-fill"></i></div>
+            <p class="lbl">Konsumsi Hari Ini</p>
+            <p class="val">12.4 <span>kWh</span></p>
+            <p class="sub-stat">↑ 2.1 kWh dari kemarin</p>
+          </div>
+          <div class="stat-card">
+            <div class="ico blue"><i class="bi bi-plug-fill"></i></div>
+            <p class="lbl">Perangkat Aktif</p>
+            <p class="val">8</p>
+            <p class="sub-stat" style="color:var(--green);">↑ 2 baru hari ini</p>
+          </div>
+          <div class="stat-card">
+            <div class="ico red"><i class="bi bi-wifi-off"></i></div>
+            <p class="lbl">Perangkat Offline</p>
+            <p class="val">2</p>
+            <p class="sub-stat" style="color:var(--red);">Perlu perhatian</p>
+          </div>
+        </div>
+
+        <div class="quick-actions-row">
+          <div class="qa-card" onclick="showTab('add-device')"><div class="qa-icon"><i class="bi bi-plus-lg"></i></div><div class="qa-text"><p>Tambah</p><span>Perangkat baru</span></div></div>
+          <div class="qa-card" onclick="showTab('schedule')"><div class="qa-icon"><i class="bi bi-calendar2-week"></i></div><div class="qa-text"><p>Jadwal</p><span>Atur otomatis</span></div></div>
+          <div class="qa-card" onclick="showTab('timer')"><div class="qa-icon"><i class="bi bi-stopwatch"></i></div><div class="qa-text"><p>Timer</p><span>Atur durasi</span></div></div>
+          <div class="qa-card" onclick="showTab('notifications')"><div class="qa-icon"><i class="bi bi-clock-history"></i></div><div class="qa-text"><p>Riwayat</p><span>Aktivitas terbaru</span></div></div>
+        </div>
+
+        <div class="section-header"><h2>Perangkat Favorit</h2><a class="lnk" style="font-size:.82rem;">Lihat Semua</a></div>
+        <div class="device-grid">
+          <div class="dev-card" onclick="openDetail('Lampu Utama','bi-lightbulb-fill')">
+            <div class="top"><div class="dev-ico on" id="h-ico-1"><i class="bi bi-lightbulb-fill"></i></div>
+            <div class="form-check form-switch sw m-0" onclick="event.stopPropagation()"><input class="form-check-input dev-sw" type="checkbox" checked data-ico="h-ico-1" data-stat="h-s-1" data-on="Menyala" data-off="Mati"></div></div>
+            <p class="dn">Lampu Utama</p><p class="ds on" id="h-s-1">Menyala</p>
+          </div>
+          <div class="dev-card" onclick="openDetail('Kipas Kamar','bi-wind')">
+            <div class="top"><div class="dev-ico off" id="h-ico-2"><i class="bi bi-wind"></i></div>
+            <div class="form-check form-switch sw m-0" onclick="event.stopPropagation()"><input class="form-check-input dev-sw" type="checkbox" data-ico="h-ico-2" data-stat="h-s-2" data-on="Menyala" data-off="Mati"></div></div>
+            <p class="dn">Kipas Kamar</p><p class="ds" id="h-s-2">Mati</p>
+          </div>
+          <div class="dev-card" onclick="openDetail('AC Kamar','bi-snow')">
+            <div class="top"><div class="dev-ico on" id="h-ico-3"><i class="bi bi-snow"></i></div>
+            <div class="form-check form-switch sw m-0" onclick="event.stopPropagation()"><input class="form-check-input dev-sw" type="checkbox" checked data-ico="h-ico-3" data-stat="h-s-3" data-on="Menyala" data-off="Mati"></div></div>
+            <p class="dn">AC Kamar</p><p class="ds on" id="h-s-3">Menyala</p>
+          </div>
+          <div class="dev-card" style="opacity:.6;" onclick="go('offline')">
+            <div class="top"><div class="dev-ico off"><i class="bi bi-tv-fill"></i></div></div>
+            <p class="dn">Smart TV</p><p class="ds">Offline</p>
+          </div>
+          <div class="dev-card" onclick="openDetail('Coffee Maker','bi-cup-hot')">
+            <div class="top"><div class="dev-ico off" id="h-ico-4"><i class="bi bi-cup-hot"></i></div>
+            <div class="form-check form-switch sw m-0" onclick="event.stopPropagation()"><input class="form-check-input dev-sw" type="checkbox" data-ico="h-ico-4" data-stat="h-s-4" data-on="Menyala" data-off="Mati"></div></div>
+            <p class="dn">Coffee Maker</p><p class="ds" id="h-s-4">Mati</p>
+          </div>
+          <div class="dev-card add-dev-card" onclick="showTab('add-device')"><i class="bi bi-plus-circle"></i> Tambah Perangkat</div>
+        </div>
+      </div>
+
+      <!-- TAB: SCHEDULE -->
+      <div class="tab-content" id="tab-schedule">
+        <div class="page-header"><h1>Jadwal Otomatis</h1><p>Atur waktu operasional perangkat pintar Anda secara otomatis untuk efisiensi energi.</p></div>
+        <div class="d-flex justify-content-end mb-3"><button class="btn-app btn-primary2" onclick="alert('Fitur tambah jadwal')"><i class="bi bi-plus-lg"></i> Tambah Jadwal</button></div>
+        <div class="sched-grid">
+          <div class="sch-card">
+            <div class="sch-head"><div class="sch-info"><div class="sch-ico"><i class="bi bi-sun"></i></div><div><p class="name">Lampu Teras</p><p class="status run" id="ss1">Berjalan</p></div></div><div class="form-check form-switch sw m-0"><input class="form-check-input sch-sw" type="checkbox" checked data-stat="ss1"></div></div>
+            <div class="sch-times"><div class="sch-t"><p class="t-lbl">Nyala</p><p class="t-val">18:00</p></div><i class="bi bi-arrow-right" style="color:var(--muted);font-size:1.1rem;"></i><div class="sch-t"><p class="t-lbl">Mati</p><p class="t-val">05:30</p></div></div>
+            <div class="days"><span class="dp a">S</span><span class="dp a">M</span><span class="dp a">T</span><span class="dp a">W</span><span class="dp a">T</span><span class="dp a">F</span><span class="dp a">S</span></div>
+          </div>
+          <div class="sch-card">
+            <div class="sch-head"><div class="sch-info"><div class="sch-ico"><i class="bi bi-snow"></i></div><div><p class="name">AC Kamar Utama</p><p class="status" id="ss2">Non-aktif</p></div></div><div class="form-check form-switch sw m-0"><input class="form-check-input sch-sw" type="checkbox" data-stat="ss2"></div></div>
+            <div class="sch-times"><div class="sch-t"><p class="t-lbl">Nyala</p><p class="t-val">22:00</p></div><i class="bi bi-arrow-right" style="color:var(--muted);font-size:1.1rem;"></i><div class="sch-t"><p class="t-lbl">Mati</p><p class="t-val">06:00</p></div></div>
+            <div class="days"><span class="dp a">S</span><span class="dp a">M</span><span class="dp a">T</span><span class="dp a">W</span><span class="dp a">T</span><span class="dp a">F</span><span class="dp a">S</span></div>
+          </div>
+          <div class="sch-card">
+            <div class="sch-head"><div class="sch-info"><div class="sch-ico"><i class="bi bi-cup-hot"></i></div><div><p class="name">Coffee Maker</p><p class="status" id="ss3">Hanya Hari Kerja</p></div></div><div class="form-check form-switch sw m-0"><input class="form-check-input sch-sw" type="checkbox" data-stat="ss3"></div></div>
+            <div class="sch-times"><div class="sch-t"><p class="t-lbl">Nyala</p><p class="t-val">07:00</p></div><i class="bi bi-arrow-right" style="color:var(--muted);font-size:1.1rem;"></i><div class="sch-t"><p class="t-lbl">Mati</p><p class="t-val">07:30</p></div></div>
+            <div class="days"><span class="dp">S</span><span class="dp a">M</span><span class="dp a">T</span><span class="dp a">W</span><span class="dp a">T</span><span class="dp a">F</span><span class="dp">S</span></div>
+          </div>
+          <div class="sch-card">
+            <div class="sch-head"><div class="sch-info"><div class="sch-ico"><i class="bi bi-lightbulb"></i></div><div><p class="name">Lampu Ruang Tamu</p><p class="status run" id="ss4">Berjalan</p></div></div><div class="form-check form-switch sw m-0"><input class="form-check-input sch-sw" type="checkbox" checked data-stat="ss4"></div></div>
+            <div class="sch-times"><div class="sch-t"><p class="t-lbl">Nyala</p><p class="t-val">17:30</p></div><i class="bi bi-arrow-right" style="color:var(--muted);font-size:1.1rem;"></i><div class="sch-t"><p class="t-lbl">Mati</p><p class="t-val">23:00</p></div></div>
+            <div class="days"><span class="dp a">S</span><span class="dp a">M</span><span class="dp a">T</span><span class="dp a">W</span><span class="dp a">T</span><span class="dp a">F</span><span class="dp a">S</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: NOTIFICATIONS -->
+      <div class="tab-content" id="tab-notifications">
+        <div class="page-header"><h1>Notifikasi</h1><p>Pantau aktivitas dan status semua perangkat Anda.</p></div>
+        <div class="notif-layout">
+          <div class="notif-list-panel">
+            <div class="notif-panel-hdr"><h3>Semua Notifikasi</h3><a class="lnk" id="clearBtn">Hapus Semua</a></div>
+            <div id="notifList">
+              <p class="notif-group-label">Hari Ini</p>
+              <div class="notif-row"><div class="n-ico red"><i class="bi bi-lightning-charge-fill"></i></div><div class="n-body"><div class="n-top"><p class="n-title">Penggunaan Listrik Tinggi</p><span class="n-time">10:45</span></div><p class="n-desc">AC Kamar Utama mendeteksi lonjakan daya di atas 1500W. Harap periksa perangkat Anda.</p></div></div>
+              <div class="notif-row"><div class="n-ico grey"><i class="bi bi-wifi-off"></i></div><div class="n-body"><div class="n-top"><p class="n-title">Perangkat Offline</p><span class="n-time">09:12</span></div><p class="n-desc">Kipas Angin Ruang Tamu terputus dari jaringan Wi-Fi. Periksa koneksi internet Anda.</p></div></div>
+              <p class="notif-group-label">Kemarin</p>
+              <div class="notif-row"><div class="n-ico green"><i class="bi bi-check-circle-fill"></i></div><div class="n-body"><div class="n-top"><p class="n-title">Jadwal Berhasil</p><span class="n-time">22:00</span></div><p class="n-desc">Skenario "Tidur Malam" telah diaktifkan secara otomatis. Semua lampu luar dimatikan.</p></div></div>
+              <div class="notif-row"><div class="n-ico blue"><i class="bi bi-wifi"></i></div><div class="n-body"><div class="n-top"><p class="n-title">Perangkat Online</p><span class="n-time">16:30</span></div><p class="n-desc">Smart Plug Dapur kembali terhubung. Perangkat siap digunakan.</p></div></div>
+            </div>
+            <div class="empty-notif" id="notifEmpty" style="display:none;"><i class="bi bi-bell-slash"></i>Tidak ada notifikasi.</div>
+          </div>
+          <div class="notif-summary-panel">
+            <div class="summ-card"><h4>Ringkasan Hari Ini</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="background:var(--red-light);border-radius:12px;padding:12px;text-align:center;"><p style="font-size:1.4rem;font-weight:800;color:var(--red);margin:0;">2</p><p style="font-size:.72rem;color:var(--red);margin:0;">Peringatan</p></div>
+                <div style="background:var(--green-light);border-radius:12px;padding:12px;text-align:center;"><p style="font-size:1.4rem;font-weight:800;color:var(--green);margin:0;">4</p><p style="font-size:.72rem;color:var(--green);margin:0;">Sukses</p></div>
+              </div>
+            </div>
+            <div class="summ-card"><h4>Status Sistem</h4>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.82rem;">Koneksi Cloud</span><span style="font-size:.75rem;font-weight:700;color:var(--green);background:var(--green-light);padding:.2rem .6rem;border-radius:10px;">Online</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.82rem;">Perangkat Aktif</span><span style="font-size:.75rem;font-weight:700;color:var(--blue);background:var(--blue-light);padding:.2rem .6rem;border-radius:10px;">8 / 10</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.82rem;">Jadwal Berjalan</span><span style="font-size:.75rem;font-weight:700;color:var(--blue);background:var(--blue-light);padding:.2rem .6rem;border-radius:10px;">3 aktif</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: PROFILE -->
+      <div class="tab-content" id="tab-profile">
+        <div class="page-header"><h1>Profil Saya</h1><p>Kelola informasi akun dan pengaturan aplikasi Anda.</p></div>
+        <div class="profile-layout">
+          <div>
+            <div class="profile-card">
+              <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
+              <h3>Aditya Pratama</h3>
+              <p class="email">aditya.pratama@email.com</p>
+              <p class="phone" style="margin-top:3px;">+62 812 3456 7890</p>
+              <div class="profile-stats">
+                <div class="profile-stat"><p class="pn">12</p><p class="pl">Perangkat</p></div>
+                <div class="profile-stat"><p class="pn" style="color:var(--green);">98%</p><p class="pl">Efisiensi</p></div>
+              </div>
+              <button class="btn-app btn-outline2 w-100 mt-3" style="font-size:.82rem;">Edit Profil</button>
+            </div>
+          </div>
+          <div>
+            <div class="settings-panel">
+              <div class="settings-panel-hdr">Pengaturan</div>
+              <div class="s-item"><i class="bi bi-cpu lead"></i>Perangkat Terhubung<i class="bi bi-chevron-right chev"></i></div>
+              <div class="s-item"><i class="bi bi-clock-history lead"></i>Riwayat Aktivitas<i class="bi bi-chevron-right chev"></i></div>
+              <div class="s-item"><i class="bi bi-bell lead"></i>Pengaturan Notifikasi<i class="bi bi-chevron-right chev"></i></div>
+              <div class="s-item"><i class="bi bi-shield-lock lead"></i>Keamanan Akun<i class="bi bi-chevron-right chev"></i></div>
+              <div class="s-item"><i class="bi bi-info-circle lead"></i>Tentang Aplikasi<i class="bi bi-chevron-right chev"></i></div>
+              <div class="s-item"><i class="bi bi-file-text lead"></i>Kebijakan Privasi<i class="bi bi-chevron-right chev"></i></div>
+            </div>
+            <button class="btn-app btn-danger2 w-100 mt-3" onclick="go('login')"><i class="bi bi-box-arrow-right"></i> Keluar dari Akun</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TIMER -->
+      <div class="tab-content" id="tab-timer">
+        <div class="page-header"><h1>Timer Perangkat</h1><p>Atur durasi waktu aktif perangkat pintar Anda.</p></div>
+        <div class="timer-layout">
+          <div class="timer-panel">
+            <div class="timer-ring"><span class="timer-disp" id="timerDisp">00:00:00</span></div>
+            <p style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Pilih Cepat</p>
+            <div class="pill-row">
+              <button class="pill" onclick="setTimer(1800,this)">30 Menit</button>
+              <button class="pill" onclick="setTimer(3600,this)">1 Jam</button>
+              <button class="pill" onclick="setTimer(7200,this)">2 Jam</button>
+            </div>
+            <p style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Atur Waktu</p>
+            <div class="time-set">
+              <div class="ts-col"><input type="number" id="tH" value="0" min="0" oninput="syncTimer()"><label>JAM</label></div>
+              <div class="ts-col"><input type="number" id="tM" value="0" min="0" max="59" oninput="syncTimer()"><label>MENIT</label></div>
+              <div class="ts-col"><input type="number" id="tS" value="0" min="0" max="59" oninput="syncTimer()"><label>DETIK</label></div>
+            </div>
+            <button class="btn-app btn-primary2 w-100" id="timerBtn" onclick="toggleTimer()"><i class="bi bi-play-fill"></i> Mulai</button>
+          </div>
+          <div class="timer-device-list">
+            <h4>Pilih Perangkat untuk Timer</h4>
+            <div class="t-dev-row"><div class="t-dev-ico"><i class="bi bi-lightbulb-fill"></i></div><div class="t-dev-info"><p class="dn">Lampu Utama</p><p class="ds">Menyala • Ruang Utama</p></div><button class="apply-btn">Terapkan</button></div>
+            <div class="t-dev-row"><div class="t-dev-ico"><i class="bi bi-wind"></i></div><div class="t-dev-info"><p class="dn">Kipas Kamar</p><p class="ds">Mati • Kamar Tidur</p></div><button class="apply-btn">Terapkan</button></div>
+            <div class="t-dev-row"><div class="t-dev-ico"><i class="bi bi-snow"></i></div><div class="t-dev-info"><p class="dn">AC Kamar Utama</p><p class="ds">Menyala • Kamar Tidur</p></div><button class="apply-btn">Terapkan</button></div>
+            <div class="t-dev-row"><div class="t-dev-ico"><i class="bi bi-cup-hot"></i></div><div class="t-dev-info"><p class="dn">Coffee Maker</p><p class="ds">Mati • Dapur</p></div><button class="apply-btn">Terapkan</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: DEVICE DETAIL -->
+      <div class="tab-content" id="tab-device-detail">
+        <div class="page-header"><h1 id="ddPageTitle">Detail Perangkat</h1><p>Pantau dan kendalikan perangkat Anda secara real-time.</p></div>
+        <div class="detail-layout">
+          <div>
+            <div class="detail-main-card">
+              <div class="d-ico-wrap"><div class="d-ico"><i id="ddIcon" class="bi bi-lightbulb-fill"></i></div><span class="d-badge on" id="ddBadge">AKTIF</span></div>
+              <h3 id="ddName">Lampu Utama</h3>
+              <p class="sub">Smart LED Bulb • Terhubung</p>
+              <div class="pwr-wrap">
+                <button class="pwr-btn" id="pwrBtn" onclick="togglePower()"><i class="bi bi-power"></i></button>
+                <span class="pwr-lbl" id="pwrLbl">NYALA</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn-app btn-outline2 w-100" onclick="showTab('schedule')" style="font-size:.8rem;"><i class="bi bi-calendar3"></i> Jadwal</button>
+                <button class="btn-app btn-outline2 w-100" onclick="showTab('timer')" style="font-size:.8rem;"><i class="bi bi-stopwatch"></i> Timer</button>
+              </div>
+            </div>
+          </div>
+          <div class="detail-right">
+            <div class="metrics-row">
+              <div class="met-c"><p class="mv">12.5</p><p class="mu">Watt</p></div>
+              <div class="met-c"><p class="mv">220</p><p class="mu">Volt</p></div>
+              <div class="met-c"><p class="mv">0.05</p><p class="mu">Ampere</p></div>
+            </div>
+            <div class="usage-card">
+              <h4>Durasi Pemakaian Hari Ini</h4>
+              <div class="usage-row"><span class="ul">Waktu Aktif</span><span class="uv">05:42 <small style="font-size:.7rem;color:var(--muted);">jam:menit</small></span></div>
+              <div class="prog"><div class="fill" style="width:71%;"></div></div>
+              <div class="prog-ends"><span>00:00</span><span>Target: 08:00</span></div>
+            </div>
+            <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(16,26,62,.05);">
+              <h4 style="font-size:.85rem;font-weight:700;margin-bottom:14px;">Informasi Perangkat</h4>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;justify-content:space-between;"><span style="font-size:.8rem;color:var(--muted);">Model</span><span style="font-size:.8rem;font-weight:600;">SP-LED-2024</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="font-size:.8rem;color:var(--muted);">Lokasi</span><span style="font-size:.8rem;font-weight:600;">Ruang Utama</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="font-size:.8rem;color:var(--muted);">Firmware</span><span style="font-size:.8rem;font-weight:600;">v3.1.2</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="font-size:.8rem;color:var(--muted);">Terakhir Online</span><span style="font-size:.8rem;font-weight:600;">Baru saja</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: ADD DEVICE -->
+      <div class="tab-content" id="tab-add-device">
+        <div class="page-header"><h1>Tambah Perangkat</h1><p>Hubungkan perangkat Smart Plug baru ke sistem Anda.</p></div>
+        <div class="add-layout">
+          <div class="add-card">
+            <div class="pair-illus"><i class="bi bi-plug"></i></div>
+            <p style="font-size:.82rem;color:var(--muted);text-align:center;margin-bottom:18px;line-height:1.5;">Pastikan perangkat Smart Plug Anda sudah dalam mode pairing sebelum melanjutkan.</p>
+            <label class="form-lbl">Nama Perangkat</label>
+            <div class="input-wrap"><input type="text" placeholder="Contoh: Lampu Ruang Tamu"><i class="bi bi-pencil" style="color:var(--muted);"></i></div>
+            <label class="form-lbl">Kategori</label>
+            <div class="cat-row">
+              <button class="cat-pill active" onclick="selectCat(this)">Smart Plug</button>
+              <button class="cat-pill" onclick="selectCat(this)">Penerangan</button>
+              <button class="cat-pill" onclick="selectCat(this)">Pendingin</button>
+              <button class="cat-pill" onclick="selectCat(this)">Keamanan</button>
+            </div>
+            <button class="btn-app btn-primary2 w-100" onclick="go('success')"><i class="bi bi-broadcast"></i> Hubungkan Perangkat</button>
+            <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:10px;">Dengan menghubungkan, Anda setuju dengan <a class="lnk">Syarat &amp; Ketentuan</a> kami.</p>
+          </div>
+          <div class="add-card">
+            <label class="form-lbl" style="margin-bottom:10px;">Pindai QR Code Perangkat</label>
+            <div class="qr-box"><i class="bi bi-qr-code-scan"></i><span>Klik untuk memindai</span></div>
+            <div style="background:var(--blue-light);border-radius:14px;padding:16px;">
+              <p style="font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:8px;"><i class="bi bi-info-circle"></i> Cara Menghubungkan</p>
+              <ol style="font-size:.78rem;color:var(--text);line-height:1.8;padding-left:18px;margin:0;">
+                <li>Colokkan Smart Plug ke stop kontak</li>
+                <li>Tahan tombol reset selama 5 detik sampai LED berkedip</li>
+                <li>Pindai QR code pada perangkat</li>
+                <li>Tunggu hingga terhubung otomatis</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- SUCCESS PAGE -->
+<div id="page-success" class="scr">
+  <div class="auth-page">
+    <div class="center-card">
+      <div class="suc-check"><i class="bi bi-check-lg"></i></div>
+      <h3>Perangkat Berhasil Ditambahkan!</h3>
+      <p class="desc">Perangkat baru Anda telah terhubung dan siap digunakan dalam sistem SmartPlug Anda.</p>
+      <div class="dev-result">
+        <div class="dr-ico"><i class="bi bi-wind"></i></div>
+        <div><p style="font-weight:700;font-size:.88rem;margin:0;">Air Purifier</p><p style="font-size:.72rem;color:var(--muted);margin:2px 0 0;">Terhubung • Ruang Tamu</p></div>
+        <div class="dr-thumb"></div>
+      </div>
+      <button class="btn-app btn-primary2 w-100" onclick="go('home')">Kembali ke Beranda &nbsp;<i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFLINE PAGE -->
+<div id="page-offline" class="scr">
+  <div class="auth-page">
+    <div class="center-card">
+      <div class="off-ico-wrap"><div class="off-ico"><i class="bi bi-cloud-slash"></i></div><div class="off-badge"><i class="bi bi-wifi-off"></i></div></div>
+      <p class="off-tag"><span class="dot-r"></span> Perangkat Offline</p>
+      <h3>Koneksi Terputus</h3>
+      <p class="desc">Koneksi ke Smart Plug terputus. Pastikan WiFi Anda aktif dan perangkat terhubung ke daya.</p>
+      <div class="d-flex flex-column gap-2 mb-4">
+        <button class="btn-app btn-primary2 w-100" id="retryBtn" onclick="retryConn()"><i class="bi bi-arrow-clockwise"></i> Coba Lagi</button>
+        <button class="btn-app btn-outline2 w-100"><i class="bi bi-activity"></i> Diagnostik</button>
+      </div>
+      <p class="hlp">Butuh bantuan? <a href="#">Pusat Bantuan</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== PAGE NAVIGATION =====
+function go(page) {
+  document.querySelectorAll('.scr').forEach(s => s.style.display = 'none');
+  if (page === 'home' || page === 'app') {
+    document.getElementById('page-app').style.display = 'block';
+    showTab('home');
+  } else if (page === 'login') {
+    document.getElementById('page-login').style.display = 'block';
+  } else if (page === 'register') {
+    document.getElementById('page-register').style.display = 'block';
+  } else if (page === 'success') {
+    document.getElementById('page-success').style.display = 'block';
+  } else if (page === 'offline') {
+    document.getElementById('page-offline').style.display = 'block';
+  }
+}
+
+// Init
+document.querySelectorAll('.scr').forEach(s => s.style.display = 'none');
+document.getElementById('page-splash').style.display = 'block';
+
+// ===== TAB NAVIGATION (inside app) =====
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.nav-link-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('tab-' + tab);
+  if (el) el.style.display = 'block';
+  const nav = document.getElementById('nav-' + tab);
+  if (nav) nav.classList.add('active');
+}
+// Init tabs
+document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+document.getElementById('tab-home').style.display = 'block';
+
+function openDetail(name, icon) {
+  document.getElementById('ddName').textContent = name;
+  document.getElementById('ddPageTitle').textContent = name;
+  document.getElementById('ddIcon').className = 'bi ' + icon;
+  pwrOn = true;
+  document.getElementById('pwrBtn').className = 'pwr-btn';
+  document.getElementById('pwrLbl').textContent = 'NYALA';
+  document.getElementById('pwrLbl').className = 'pwr-lbl';
+  document.getElementById('ddBadge').textContent = 'AKTIF';
+  document.getElementById('ddBadge').className = 'd-badge on';
+  showTab('device-detail');
+}
+
+// ===== Device toggles =====
+document.querySelectorAll('.dev-sw').forEach(function(sw) {
+  sw.addEventListener('change', function() {
+    var ico = document.getElementById(this.dataset.ico);
+    var stat = document.getElementById(this.dataset.stat);
+    if (this.checked) {
+      ico.className = 'dev-ico on'; stat.textContent = this.dataset.on; stat.className = 'ds on';
+    } else {
+      ico.className = 'dev-ico off'; stat.textContent = this.dataset.off; stat.className = 'ds';
+    }
+  });
+});
+
+// ===== Schedule toggles =====
+document.querySelectorAll('.sch-sw').forEach(function(sw) {
+  sw.addEventListener('change', function() {
+    var s = document.getElementById(this.dataset.stat);
+    if (this.checked) { s.textContent = 'Berjalan'; s.className = 'status run'; }
+    else { s.textContent = 'Non-aktif'; s.className = 'status'; }
+  });
+});
+
+// ===== Notifications =====
+document.getElementById('clearBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('notifList').style.display = 'none';
+  document.getElementById('notifEmpty').style.display = 'block';
+});
+
+// ===== Category pills =====
+function selectCat(el) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== Power toggle =====
+var pwrOn = true;
+function togglePower() {
+  pwrOn = !pwrOn;
+  var btn = document.getElementById('pwrBtn'), lbl = document.getElementById('pwrLbl'), badge = document.getElementById('ddBadge');
+  if (pwrOn) {
+    btn.className = 'pwr-btn'; lbl.textContent = 'NYALA'; lbl.className = 'pwr-lbl';
+    badge.textContent = 'AKTIF'; badge.className = 'd-badge on';
+  } else {
+    btn.className = 'pwr-btn off'; lbl.textContent = 'MATI'; lbl.className = 'pwr-lbl off';
+    badge.textContent = 'NON-AKTIF'; badge.className = 'd-badge off';
+  }
+}
+
+// ===== Retry offline =====
+function retryConn() {
+  var btn = document.getElementById('retryBtn');
+  btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Menghubungkan...'; btn.disabled = true;
+  setTimeout(function() { go('home'); btn.innerHTML='<i class="bi bi-arrow-clockwise"></i> Coba Lagi'; btn.disabled=false; }, 1400);
+}
+
+// ===== Timer =====
+var timerSecs = 0, timerRunning = false, timerInt = null;
+function fmt2(n) { return String(n).padStart(2,'0'); }
+function renderTimer() { var h=Math.floor(timerSecs/3600),m=Math.floor((timerSecs%3600)/60),s=timerSecs%60; document.getElementById('timerDisp').textContent=fmt2(h)+':'+fmt2(m)+':'+fmt2(s); }
+function syncTimer() { timerSecs=(parseInt(document.getElementById('tH').value)||0)*3600+(parseInt(document.getElementById('tM').value)||0)*60+(parseInt(document.getElementById('tS').value)||0); renderTimer(); }
+function setTimer(secs,el) { document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); timerSecs=secs; document.getElementById('tH').value=Math.floor(secs/3600); document.getElementById('tM').value=Math.floor((secs%3600)/60); document.getElementById('tS').value=secs%60; renderTimer(); }
+function toggleTimer() { var btn=document.getElementById('timerBtn'); if(timerRunning){clearInterval(timerInt);timerRunning=false;btn.innerHTML='<i class="bi bi-play-fill"></i> Mulai';}else{syncTimer();if(timerSecs<=0)return;timerRunning=true;btn.innerHTML='<i class="bi bi-stop-fill"></i> Berhenti';timerInt=setInterval(function(){timerSecs--;renderTimer();if(timerSecs<=0){clearInterval(timerInt);timerRunning=false;btn.innerHTML='<i class="bi bi-play-fill"></i> Mulai';}},1000);} }
+renderTimer();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
